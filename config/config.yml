@@ -1,0 +1,22 @@
+database:
+  host: localhost
+  user: MCSPWS                           
+  password: 
+  db: mcspws
+
+server:
+  host: 0.0.0.0
+  port: 25515
+  debug: false
+
+servers:
+  - name: "114514"
+    address: "11.45.14.11:225565"
+
+site_info:
+  title: "我的MC服务器"
+  description: "欢迎来到我们的Minecraft冒险世界！"
+  qq_group: "12345678"
+  rules: 
+    - "禁止使用外挂"
+    - "保持友好交流"

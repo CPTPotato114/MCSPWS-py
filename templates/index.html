@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- 主内容区 -->
+    <div class="col-lg-8">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h4 class="my-0 fw-normal">欢迎来到{{ site_info.title }}</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title text-muted">服务器简介</h5>
+                <p class="card-text lead">{{ config.description }}</p>
+                
+                <h5 class="mt-4 text-muted">基本规则</h5>
+                <ul class="list-group list-group-flush">
+                {% for rule in site_info.rules %}
+                    <li class="list-group-item d-flex align-items-center">
+                        <span class="badge bg-danger me-2">!</span>
+                        {{ rule }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 侧边信息栏 -->
+    <div class="col-lg-4">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="my-0 fw-normal">加入我们</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-hdd-network-fill fs-4 me-2 text-primary"></i>
+                        <div>
+                            <h6 class="mb-0">服务器地址</h6>
+                            <div class="input-group mt-2">
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="serverAddress" 
+                                       value="{{ servers[0].address.split(':')[0] }}"
+                                       readonly>
+                                <button class="btn btn-outline-secondary" 
+                                        type="button" 
+                                        onclick="copyAddress()">
+                                    复制
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-people-fill fs-4 me-2 text-info"></i>
+                        <div>
+                            <h6 class="mb-0">QQ交流群</h6>
+                            <a href="https://qm.qq.com/q/{{ site_info.qq_group }}" 
+                               class="btn btn-primary mt-2" 
+                               target="_blank">
+                                {{ site_info.qq_group }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyAddress() {
+    const copyText = document.getElementById("serverAddress");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // 适配移动端
+    
+    try {
+        navigator.clipboard.writeText(copyText.value);
+        alert("地址已复制到剪贴板！");
+    } catch (err) {
+        alert("复制失败，请手动选择地址");
+    }
+}
+</script>
+
+<style>
+.card {
+    border-radius: 15px;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.list-group-item {
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+.bi {
+    min-width: 1.5em;
+}
+</style>
+{% endblock %}

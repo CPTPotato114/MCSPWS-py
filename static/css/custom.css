@@ -1,0 +1,62 @@
+/* static/css/custom.css */
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    margin-top: 20px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.server-status .badge {
+    font-size: 0.9rem;
+    padding: 0.5em 0.75em;
+}
+
+.motd {
+    font-family: 'Minecraft', sans-serif;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.motd strong { font-weight: bold; }
+.motd em { font-style: italic; }
+.motd u { text-decoration: underline; }
+.motd del { text-decoration: line-through; }
+.motd span[style*="#000000"] { color: #000000 !important; }  /* §0 */
+.motd span[style*="#0000AA"] { color: #0000AA !important; }  /* §1 */
+.motd .gradient-text {
+    background-clip: text !important;
+    -webkit-background-clip: text !important;
+    color: transparent !important;
+    display: inline-block;
+}
+.motd .rainbow {
+    background: linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8F00FF) !important;
+}
+
+/* 加载Minecraft字体 */
+@font-face {
+    font-family: 'Minecraft';
+    src: url('/static/fonts/minecraft.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.card {
+    transition: transform 0.2s;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.motd {
+    font-family: 'Monocraft', monospace;
+    white-space: pre-wrap;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}

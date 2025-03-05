@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    {% for server in servers %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ server.name }}</h5>
+                <div class="server-status">
+                    <span class="badge bg-{% if status_data[server.address].online %}success{% else %}danger{% endif %}">
+                        {% if status_data[server.address].online %}在线{% else %}离线{% endif %}
+                    </span>
+                    <p>玩家: {{ status_data[server.address].players_online }}/{{ status_data[server.address].players_max }}</p>
+                    <div class="motd">{{ status_data[server.address].motd | mc_to_html | safe }}</div>
+                </div>
+                <div id="chart-{{ loop.index }}" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.2/echarts.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% for server in servers %}
+    (function() {
+        const container = document.getElementById('chart-{{ loop.index }}');
+        if (!container) return;
+        
+        const chart = echarts.init(container);
+        const rawData = {{ history_data[server.address] | tojson }};
+        
+        // 处理数据点颜色
+        const seriesData = rawData.map(item => ({
+            value: [item.time, item.players],
+            itemStyle: {
+                color: item.online ? '#4CAF50' : '#F44336' // 在线绿色，离线红色
+            }
+        }));
+
+        // 计算Y轴最大值
+        const validValues = rawData.filter(d => d.players > 0).map(d => d.players);
+        const maxValue = validValues.length > 0 ? Math.max(...validValues) : 10;
+        const yMax = Math.ceil(maxValue * 1.2); // 留出20%空间
+
+        const option = {
+            tooltip: {
+                trigger: 'axis',
+                formatter: function(params) {
+                    const data = rawData[params[0].dataIndex];
+                    const date = new Date(data.time);
+                    return `
+                        ${date.toLocaleDateString()} ${date.toLocaleTimeString()}<br/>
+                        状态: ${data.online ? '在线' : '离线'}<br/>
+                        玩家: ${data.players}/${data.max}
+                    `;
+                }
+            },
+            xAxis: {
+                type: 'time',
+                axisLabel: {
+                    formatter: function(value) {
+                        return echarts.time.format(value, '{MM}-{dd} {HH}:{mm}', false);
+                    }
+                }
+            },
+            yAxis: {
+                type: 'value',
+                min: 0,
+                max: yMax,
+                splitLine: { show: true }
+            },
+            series: [{
+                type: 'line',
+                smooth: true,
+                showSymbol: false,
+                lineStyle: {
+                    width: 2,
+                    color: '#4CAF50' // 主线条颜色
+                },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(76, 175, 80, 0.3)' },
+                        { offset: 1, color: 'rgba(76, 175, 80, 0)' }
+                    ])
+                },
+                data: seriesData,
+                markArea: { // 添加离线区域标注
+                    silent: true,
+                    itemStyle: {
+                        color: 'rgba(244, 67, 54, 0.1)'
+                    },
+                    data: getOfflinePeriods(rawData)
+                }
+            }]
+        };
+
+        chart.setOption(option);
+        window.addEventListener('resize', () => chart.resize());
+
+        // 获取离线时间段
+        function getOfflinePeriods(data) {
+            const periods = [];
+            let start = null;
+            
+            data.forEach((d, i) => {
+                if (!d.online && start === null) {
+                    start = d.time;
+                } else if (d.online && start !== null) {
+                    periods.push([{ xAxis: start }, { xAxis: data[i-1].time }]);
+                    start = null;
+                }
+            });
+            
+            if (start !== null) {
+                periods.push([{ xAxis: start }, { xAxis: data[data.length-1].time }]);
+            }
+            
+            return periods;
+        }
+    })();
+    {% endfor %}
+});
+</script>
+{% endblock %}
